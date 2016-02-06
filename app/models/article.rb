@@ -420,6 +420,7 @@ class Article < Content
     return if self == other_article
 
     self.body = ([self.body, other_article.body].join(" "))
+    self.published_comments = self.published_comments + other_article.published_comments
     self.save
     other_article.delete
     self

@@ -666,7 +666,6 @@ describe Admin::ContentController do
       it "should merge articles" do
         article1 = Factory(:article, user: @user, title: "Article1", body: "content1")
         article2 = Factory(:article, user: @user, title: "Article2", body: "content2")
-        # assert_equal(2, Article.count)
         post :merge, id: article1.id, merge_with: article2.id
 
         article1.reload
