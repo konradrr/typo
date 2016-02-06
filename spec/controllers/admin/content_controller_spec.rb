@@ -48,7 +48,7 @@ describe Admin::ContentController do
       response.should render_template('index')
       response.should be_success
     end
-    
+
     it 'should restrict to withdrawn articles' do
       article = Factory(:article, :state => 'withdrawn', :published_at => '2010-01-01')
       get :index, :search => {:state => 'withdrawn'}
@@ -56,7 +56,7 @@ describe Admin::ContentController do
       response.should render_template('index')
       response.should be_success
     end
-  
+
     it 'should restrict to withdrawn articles' do
       article = Factory(:article, :state => 'withdrawn', :published_at => '2010-01-01')
       get :index, :search => {:state => 'withdrawn'}
@@ -656,6 +656,23 @@ describe Admin::ContentController do
         ensure
           ActionMailer::Base.perform_deliveries = false
         end
+      end
+    end
+
+    describe 'merge action' do
+      before do
+        Article.destroy_all
+      end
+      it "should merge articles" do
+        article1 = Factory(:article, user: @user, title: "Article1", body: "content1")
+        article2 = Factory(:article, user: @user, title: "Article2", body: "content2")
+        # assert_equal(2, Article.count)
+        post :merge, id: article1.id, merge_with: article2.id
+
+        article1.reload
+        assert_equal(1, Article.count)
+        assert_equal(article1.title, "Article1")
+        assert_equal(article1.body, "content1 content2")
       end
     end
 

@@ -41,6 +41,13 @@ Given /^the blog is set up$/ do
                 :profile_id => 1,
                 :name => 'admin',
                 :state => 'active'})
+
+  User.create!({:login => 'publisher',
+                :password => '123456',
+                :email => 'john@snow.com',
+                :profile_id => 2,
+                :name => 'publisher',
+                :state => 'active'})
 end
 
 And /^I am logged into the admin panel$/ do
@@ -53,6 +60,30 @@ And /^I am logged into the admin panel$/ do
   else
     assert page.has_content?('Login successful')
   end
+end
+
+And /^I merge in article with title "([^"]*)"$/ do |title|
+  article = Article.find_by_title(title)
+  body = article.body
+  fill_in(:merge_with, with: article.id)
+  click_button "Merge"
+end
+
+And /^I am logged into the publisher panel$/ do
+  visit '/accounts/login'
+  fill_in 'user_login', with: 'publisher'
+  fill_in 'user_password', with: '123456'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
+When /^I visit article with title "(.*?)"$/ do |title|
+  article = Article.find_by_title(title)
+  visit "/articles/#{article.id}"
 end
 
 # Single-line step scoper
@@ -175,6 +206,16 @@ Then /^the "([^"]*)" field(?: within (.*))? should contain "([^"]*)"$/ do |field
     else
       assert_match(/#{value}/, field_value)
     end
+  end
+end
+
+Then /^I should see "([^"]*)" and "([^"]*)" in merged article$/ do |text1, text2|
+  if page.respond_to? :should
+    page.should have_content(text1)
+    page.should have_content(text2)
+  else
+    assert page.has_content?(text1)
+    assert page.has_content?(text2)
   end
 end
 

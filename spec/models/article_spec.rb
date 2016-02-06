@@ -184,25 +184,25 @@ describe Article do
   ### XXX: Should we have a test here?
   it "test_send_multiple_pings" do
   end
-  
+
   describe "Testing redirects" do
     it "a new published article gets a redirect" do
       a = Article.create(:title => "Some title", :body => "some text", :published => true)
       a.redirects.first.should_not be_nil
       a.redirects.first.to_path.should == a.permalink_url
     end
-    
-    it "a new unpublished article should not get a redirect" do 
+
+    it "a new unpublished article should not get a redirect" do
       a = Article.create(:title => "Some title", :body => "some text", :published => false)
       a.redirects.first.should be_nil
     end
-    
+
     it "Changin a published article permalink url should only change the to redirection" do
       a = Article.create(:title => "Some title", :body => "some text", :published => true)
       a.redirects.first.should_not be_nil
       a.redirects.first.to_path.should == a.permalink_url
       r  = a.redirects.first.from_path
-      
+
       a.permalink = "some-new-permalink"
       a.save
       a.redirects.first.should_not be_nil
@@ -571,7 +571,7 @@ describe Article do
     describe "#find_by_permalink" do
       it "uses UTC to determine correct day" do
         @a.save
-        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 21, :permalink => 'a-big-article' 
+        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 21, :permalink => 'a-big-article'
         a.should == @a
       end
     end
@@ -592,7 +592,7 @@ describe Article do
     describe "#find_by_permalink" do
       it "uses UTC to determine correct day" do
         @a.save
-        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 22, :permalink => 'a-big-article' 
+        a = Article.find_by_permalink :year => 2011, :month => 2, :day => 22, :permalink => 'a-big-article'
         a.should == @a
       end
     end
@@ -630,5 +630,16 @@ describe Article do
     end
 
   end
-end
 
+  describe "#merge_with!" do
+    article1 = Factory.create(:article, title: "First Article", body: "Some conent of the first article.")
+    article2 = Factory.create(:article, title: "Second Article", body: "Some conent of the second article.")
+
+    it "merges two articles" do
+      article1.merge_with!(article2)
+      assert_equal(1, Article.count)
+      assert_equal("First Article", article1.title)
+      assert_equal("Some conent of the first article. Some conent of the second article.", article1.body)
+    end
+  end
+end

@@ -104,10 +104,10 @@ class Article < Content
     end
 
     def search_with_pagination(search_hash, paginate_hash)
-      
+
       state = (search_hash[:state] and ["no_draft", "drafts", "published", "withdrawn", "pending"].include? search_hash[:state]) ? search_hash[:state] : 'no_draft'
-      
-      
+
+
       list_function  = ["Article.#{state}"] + function_search_no_draft(search_hash)
 
       if search_hash[:category] and search_hash[:category].to_i > 0
@@ -414,6 +414,15 @@ class Article < Content
 
   def access_by?(user)
     user.admin? || user_id == user.id
+  end
+
+  def merge_with!(other_article)
+    return if self == other_article
+
+    self.body = ([self.body, other_article.body].join(" "))
+    self.save
+    other_article.delete
+    self
   end
 
   protected
